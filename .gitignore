@@ -105,3 +105,4 @@ venv.bak/
 
 MNIST_data/
 data/
+mnist_log/
