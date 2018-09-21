@@ -13,8 +13,7 @@ def regression(x):
 # 定义卷积模型
 def convolutional(x, keep_prob):
     def conv2d(x, w):
-        return tf.nn.conv2d(
-            x, w, [1, 1, 1, 1],padding='SAME')
+        return tf.nn.conv2d(x, w, [1, 1, 1, 1], padding='SAME')
 
     def max_pool_2x2(x):
         return tf.nn.max_pool(

@@ -103,6 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-MNIST_data/
-data/
-mnist_log/
+mnist/MNIST_data/
+mnist/data/
+mnist/mnist_log/
