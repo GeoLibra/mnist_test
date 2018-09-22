@@ -19,7 +19,7 @@ config.gpu_options.allow_growth = True
 
 x = tf.placeholder("float", [None, 784])
 sess = tf.Session(config=config)
-sess.run(tf.global_variables_initializer())
+
 
 with tf.variable_scope("regression"):
     print(model.regression(x))
@@ -32,6 +32,7 @@ if regression_file is not None:
 with tf.variable_scope("convolutional"):
     keep_prob = tf.placeholder("float")
     y2, variables = model.convolutional(x, keep_prob)
+sess.run(tf.global_variables_initializer())
 saver = tf.train.Saver(variables)
 convolutional_file = tf.train.latest_checkpoint(
     "mnist/data/convolutional.ckpt")
@@ -48,7 +49,7 @@ def convolutional(input):
         y2, feed_dict={
             x: input,
             keep_prob: 1.0
-        }).flattern().tolist()
+        }).flatten().tolist()
 
 
 app = Flask(__name__)

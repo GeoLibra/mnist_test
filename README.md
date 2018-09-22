@@ -17,3 +17,6 @@ sess = tf.Session(config=config)
 ```python
 sess.run(tf.global_variables_initializer())
 ```
+3. Attempting to use uninitialized value Variable Caused by op u'Variable/read'  
+解决方法:
+将 `sess.run(tf.global_variables_initializer())` 放到后面
