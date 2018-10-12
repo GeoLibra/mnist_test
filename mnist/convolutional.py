@@ -26,6 +26,12 @@ with tf.Session() as sess:
 
     sess.run(tf.global_variables_initializer())
 
+    # 断点续训
+    ckpt = tf.train.get_checkpoint_state(
+        os.path.join(os.path.dirname(__file__), 'data', 'convalution.ckpt'))
+    if ckpt and ckpt.model_checkpoint_path:
+        saver.restore(sess, ckpt.model_checkpoint_path)
+
     for i in range(20000):
         batch = data.train.next_batch(50)
         if i % 100 == 0:

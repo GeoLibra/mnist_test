@@ -19,6 +19,13 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 saver = tf.train.Saver()
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
+
+    # 断点续训
+    ckpt = tf.train.get_checkpoint_state(
+        os.path.join(os.path.dirname(__file__), 'data', 'regression.ckpt'))
+    if ckpt and ckpt.model_checkpoint_path:
+        saver.restore(sess, ckpt.model_checkpoint_path)
+
     for item in range(1000):
         batch_xs, batch_ys = data.train.next_batch(100)
         sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
