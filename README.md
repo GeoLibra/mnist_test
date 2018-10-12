@@ -1,5 +1,31 @@
 # mnist_test
 mnist数据集的使用
+## 保存模型
+```python
+saver=tf.train.Save() # 实例化saver对象
+with tf.Session() as sess: # 在with结构for循环中一定轮数时 保存模型到当前回话
+    for i in range(STEPS):
+        if i % 轮数 ==0: 
+            saver.save(sess,os.path.join(MODEL_SAVE_PATH,MODEL_NAME),global_step=global_step)
+```
+## 加载模型
+```python
+with tf.Session() as sess:
+    ckpt=tf.train.get_checkpoint_state(存储路径)
+    if ckpt and ckpt.model_checkpoint_path:
+        saver.restore(sess,ckpt.model_checkpoint_path)
+```
+## 实例化可还原滑动平均值的saver
+```python
+ema=tf.train.ExponentialMovineAverage(滑动平均基数)
+ema_restore=ema.variables_to_restore()
+saver=tf.train.Saver(ema_restore)
+```
+## 准确率计算方法
+```python
+correct_prediction=tf.equal(tf.argmax(y,1),tf.argmax(y_,1))
+accuracy=tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+```
 ## 遇到的问题  
 1. CUDA_ERROE_OUT_OF_MEMORY  
 服务器的GPU大小为M,tensorflow只能申请N（N<M）,也就是tensorflow告诉你 不能申请到GPU的全部资源,然后就不干了  
