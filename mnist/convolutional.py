@@ -13,7 +13,8 @@ with tf.variable_scope("convolutional"):
 # 训练
 y1 = tf.placeholder(dtype=tf.float32, shape=[None, 10], name='y1')
 cross_entropy = -tf.reduce_sum(y1 * tf.log(y))
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+learning_rate = 1e-4
+train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y1, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
