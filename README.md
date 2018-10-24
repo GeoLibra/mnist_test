@@ -1,5 +1,16 @@
 # mnist_test
 mnist数据集的使用
+## one_hot
+```python
+data = input_data.read_data_sets('MNIST_data', one_hot=True)
+```
+one_hot=True表示将样本标签转化为one_hot编码。  
+举例：假如一共10类。  
+0-->1000000000  
+1-->0100000000  
+2-->0010000000
+3-->0001000000  
+以此类推。只有一位为1，1所在的位置就代表着第几类。
 ## 保存模型
 ```python
 saver=tf.train.Save() # 实例化saver对象
