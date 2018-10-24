@@ -17,25 +17,74 @@ MOVING_AVERAGE_DECAY = 0.99  # 滑动平均衰减率
 一个辅助函数,给定神经网络的输入和所有参数,计算神经网络的前向传播结果,在这里定义了一个使用ReLU激活函数的三层全连接神经网络。
 通过加入隐藏层实现了多层网络结构,通过ReLU激活函数实现去线性化.在这个函数中也支持传入用于计算参数平均值的类,这样方便在测试时使用滑动平均模型
 '''
-def backward(input_tensor, avg_class, weight1, biases1, weight2, biases2):
+
+
+def backward(input_tensor, avg_class, reuse=False):
     # 当没有提供滑动平均类时,直接使用参数当前取值
     if avg_class == None:
-        # 计算隐藏层的前向传播结果
-        layer1 = tf.nn.relu(tf.matmul(input_tensor, weight1) + biases1)
         '''
         计算输出层前向传播结果,因为在计算损失函数时就会一并计算softmax函数,
         所以这里不需要加入激活函数。而且不加入softmax不会影响预测结果。因为预测时
         使用的是不用类别对应节点输出值的相对大小,有没有softmax层对最后分类结果的计算没有影响
         于是在计算整个神经网络的前向传播时可以不加入最后的softmax层
         '''
-        return tf.matmul(layer1, weight2) + biases2
+        # 定义第一层神经网络的变量和前向传播过程
+        with tf.variable_scope('layer1', reuse=reuse):
+            '''
+            根据传进来的reuse来判断是创建新变量还是使用自己已经创建好的.在第一次构造网络时需要创建新变量,
+            以后每次调用这个函数都是直接使用reuse=True就不需要每次将变量传进来
+            '''
+            weights = tf.get_variable(
+                name='weights',
+                shape=[INPUT_NODE, LAYER1_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            biases = tf.get_variable(
+                name='biases',
+                shape=[LAYER1_NODE],
+                initializer=tf.constant_initializer(0.0))
+            layer1 = tf.nn.relu(tf.matmul(input_tensor, weights) + biases)
+        # 类似的定义第二层神经网络的变量和前向传播过程
+        with tf.variable_scope('layer2', reuse=reuse):
+            weights = tf.get_variable(
+                name='weights',
+                shape=[LAYER1_NODE, OUTPUT_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            biases = tf.get_variable(
+                name='biases',
+                shape=[OUTPUT_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            layer2 = tf.matmul(layer1, weights) + biases
+        # 返回最后的前向传播结果
+        return layer2
     else:
         # 首先使用 avg_class.average 函数来计算得出变量的滑动平均,然后计算相应的神经网络前向传播结果
-        layer1 = tf.nn.relu(
-            tf.matmul(input_tensor, avg_class.average(weight1)) +
-            avg_class.average(biases1))
-        return tf.matmul(
-            layer1, avg_class.average(weight2)) + avg_class.average(biases2)
+        # 定义第一层神经网络的变量和前向传播过程
+        with tf.variable_scope('layer1', reuse=reuse):
+            weights = tf.get_variable(
+                name='weights',
+                shape=[INPUT_NODE, LAYER1_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            biases = tf.get_variable(
+                name='biases',
+                shape=[LAYER1_NODE],
+                initializer=tf.constant_initializer(0.0))
+            layer1 = tf.nn.relu(
+                tf.matmul(input_tensor, avg_class.average(weights)) +
+                avg_class.average(biases))
+        # 类似的定义第二层神经网络的变量和前向传播过程
+        with tf.variable_scope('layer2', reuse=reuse):
+            weights = tf.get_variable(
+                name='weights',
+                shape=[LAYER1_NODE, OUTPUT_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            biases = tf.get_variable(
+                name='biases',
+                shape=[OUTPUT_NODE],
+                initializer=tf.truncated_normal_initializer(stddev=0.1))
+            layer2 = tf.matmul(
+                layer1, avg_class.average(weights)) + avg_class.average(biases)
+        # 返回最后的前向传播结果
+        return layer2
 
 
 # 训练模型的过程
@@ -50,9 +99,7 @@ def get_train(mnist):
     weight2 = tf.Variable(
         tf.truncated_normal([LAYER1_NODE, OUTPUT_NODE], stddev=0.1))
     biases2 = tf.Variable(tf.constant(0.1, shape=[OUTPUT_NODE]))
-
-    # 计算在当前参数下神经网络的前向传播结果
-    y = backward(x, None, weight1, biases1, weight2, biases2)
+    y = backward(x, None)
 
     # 定义存储训练轮数的变量,这个变量不需要计算滑动平均值,所以指定为不可训练的变量.
     global_step = tf.Variable(0, trainable=False)
@@ -68,8 +115,7 @@ def get_train(mnist):
     滑动平均不会改变变量本身的取值而是维护一个影子变量来记录其滑动平均值
     所以当需要使用这个滑动平均值时,需要明确调用average函数
     '''
-    average_y = backward(x, variable_averages, weight1, biases1, weight2,
-                         biases2)
+    average_y = backward(x, variable_averages)
     '''
     计算交叉熵作为刻画预测值和真实值之间差距的损失函数
     这里使用sparse_softmax_cross_entropy_with_logits函数来计算交叉熵,
