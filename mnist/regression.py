@@ -12,7 +12,7 @@ with tf.variable_scope("regression"):
 # train
 y_ = tf.placeholder("float", [None, 10])
 cross_entropy = -tf.reduce_sum(y_ * tf.log(y))
-learning_rate = 0.01
+learning_rate = 0.001
 train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(
     cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
@@ -28,7 +28,7 @@ with tf.Session() as sess:
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
 
-    for item in range(1000):
+    for item in range(50000):
         batch_xs, batch_ys = data.train.next_batch(100)
         sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
     print((sess.run(
