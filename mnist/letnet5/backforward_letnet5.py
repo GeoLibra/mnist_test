@@ -86,16 +86,16 @@ def backward(mnist):
             if i % 100 == 0:
                 print("After %d training step,loss on training batch is %g." %
                       (step, loss_value))
-                saver.restore(
+                saver.save(
                     sess,
                     os.path.join(MODEL_SAVE_PATH, MODEL_NAME),
                     global_step=global_step)
 
 
-def main():
+def main(argv=None):
     mnist = input_data.read_data_sets("../MNIST_data", one_hot=True)
     backward(mnist)
 
 
-if __name__ == "__mian__":
-    main()
+if __name__ == "__main__":
+    tf.app.run()

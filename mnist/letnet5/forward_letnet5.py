@@ -34,12 +34,12 @@ def get_bias(shape):
 
 def conv2d(x, w):
     return tf.nn.conv2d(
-        input=x, filter=w, strides=[1, 1, 1, 1], padding='SNAME')
+        input=x, filter=w, strides=[1, 1, 1, 1], padding='SAME')
 
 
 def max_pool_2x2(x):
     return tf.nn.max_pool(
-        inoput=x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SNAME')
+        x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
 def forward(x, train, regularizer):

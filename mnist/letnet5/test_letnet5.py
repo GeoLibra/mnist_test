@@ -17,7 +17,7 @@ def test(mnist):
         y_ = tf.placeholder(tf.float32, [None, forward_letnet5.OUTPUT_NODE])
         y = forward_letnet5.forward(x, False, None)
         ema = tf.train.ExponentialMovingAverage(
-            forward_letnet5.MOVING_AVERAGE_DECAY)
+            backforward_letnet5.MOVING_AVERAGE_DECAY)
         ema_restore = ema.variables_to_restore()
         saver = tf.train.Saver(ema_restore)
         # 判断预测值和实际值是否相同
@@ -58,5 +58,5 @@ def main():
     test(mnist)
 
 
-if __name__ == "__mian__":
+if __name__ == "__main__":
     main()
