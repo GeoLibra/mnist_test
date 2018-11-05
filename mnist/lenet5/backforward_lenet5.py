@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
-import forward_letnet5
+import forward_lenet5
 import os
 import numpy as np
 # 定义训练过程中的超参数
@@ -20,12 +20,12 @@ def backward(mnist):
     x,y_是定义的占符,需要指定参数的类型,维度(和网络的输入与输出维度一致),类似于函数的形参,运行时必须传入
     '''
     x = tf.placeholder(tf.float32, [
-        BATCH_SIZE, forward_letnet5.IMAGE_SIZE, forward_letnet5.IMAGE_SIZE,
-        forward_letnet5.NUM_CHANNELS
+        BATCH_SIZE, forward_lenet5.IMAGE_SIZE, forward_lenet5.IMAGE_SIZE,
+        forward_lenet5.NUM_CHANNELS
     ])
-    y_ = tf.placeholder(tf.float32, [None, forward_letnet5.OUTPUT_NODE])
+    y_ = tf.placeholder(tf.float32, [None, forward_lenet5.OUTPUT_NODE])
     # 调用前向传播网络得到维度为10的tensor
-    y = forward_letnet5.forward(x, True, REGULARIZER)
+    y = forward_lenet5.forward(x, True, REGULARIZER)
     global_step = tf.Variable(0, trainable=False)  # 声明一个全局计数器,并输出化为0
     '''
     先是对网络最后一层输出y做softmax,通常是求取输出属于某一类的概率,其实就是一个num_classess大小的向量,
@@ -75,8 +75,8 @@ def backward(mnist):
             xs, ys = mnist.train.next_batch(BATCH_SIZE)
             # 将输入数据xs转换成与网络输入相同形状的矩阵
             reshaped_xs = np.reshape(
-                xs, (BATCH_SIZE, forward_letnet5.IMAGE_SIZE,
-                     forward_letnet5.IMAGE_SIZE, forward_letnet5.NUM_CHANNELS))
+                xs, (BATCH_SIZE, forward_lenet5.IMAGE_SIZE,
+                     forward_lenet5.IMAGE_SIZE, forward_lenet5.NUM_CHANNELS))
             # 喂入训练图像和标签,开始训练
             _, loss_value, step = sess.run([train_op, loss, global_step],
                                            feed_dict={
